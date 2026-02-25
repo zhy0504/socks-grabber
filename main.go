@@ -26,7 +26,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"syscall"
 	"time"
 
 	"golang.org/x/net/proxy"
@@ -467,9 +466,7 @@ func ensureFlareSolverrReady(endpoint string) error {
 	cmd.Dir = filepath.Dir(exePath)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	if runtime.GOOS == "windows" {
-		cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
-	}
+	applyPlatformProcAttr(cmd)
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("failed to start %s: %w", exePath, err)
 	}
