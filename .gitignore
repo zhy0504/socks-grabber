@@ -1,5 +1,9 @@
 flaresolverr/
 *.exe
+*.exe~
+*.dll
+*.so
+*.dylib
 *.tmp
 *.log
 test.txt
@@ -9,3 +13,12 @@ alive.txt
 all_proxies.csv
 proxies.txt
 proxies.json
+*.test
+*.out
+coverage.*
+*.coverprofile
+profile.cov
+# vendor/
+go.work
+go.work.sum
+.env
