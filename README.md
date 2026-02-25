@@ -1,132 +1,103 @@
-# spys.one SOCKS 抓取器（FlareSolverr Only）
+# socks-grabber
 
-当前版本已精简为 **仅通过 FlareSolverr 过盾并抓取**，不再使用浏览器兜底或直连抓取。
+一个基于 Go 的 SOCKS 代理抓取与检测工具。
 
-支持配置文件启动。
+## FlareSolverr 作用
 
-优先级：`命令行参数 > 配置文件 > 默认值`
+`spys.one` 有 Cloudflare/反爬挑战，普通 HTTP 请求经常拿不到可解析页面。
 
-默认会自动查找 `socks-grabber.json`：
-- 可执行文件同目录（如 `socks-grabber` 或 `socks-grabber.exe`）
+FlareSolverr 在本项目中的作用是：
+- 处理挑战页并返回可解析 HTML
+- 让程序稳定获取代理列表
+- 作为抓取链路的核心依赖
+
+主要功能：
+- 通过 FlareSolverr 抓取 `spys.one` 代理列表
+- 自动处理 FlareSolverr：检测、启动、缺失时按系统自动下载
+- 可用性检测（TCP、SOCKS5 握手、通过代理访问测试网址）
+- 导出两份结果：
+  - `txt`：仅可用代理，格式 `协议://ip:port`
+  - `csv`：全部代理及检测结果（含失败原因）
+- 支持 CLI 与 GUI
+
+支持平台（与 FlareSolverr 自动下载能力保持一致）：
+- Windows x64
+- Linux x64
+
+## 如何使用
+
+默认优先级：`命令行参数 > 配置文件 > 默认值`
+
+默认会自动查找配置文件 `socks-grabber.json`：
+- 可执行文件同目录
 - 当前工作目录
 
-也可手动指定：`-config "/path/to/socks-grabber.json"`
+---
 
-程序会自动检测：
-- 可执行文件同目录下是否存在 `flaresolverr/flaresolverr`（Windows 为 `flaresolverr.exe`）
-- 如果 FlareSolverr 未运行且该文件存在，会自动启动并等待服务就绪后再抓取
+## 源代码启动
 
-如果同级目录没有 FlareSolverr，程序会按当前操作系统自动下载最新版并解压到同级目录：
-- Windows: `flaresolverr_windows_x64.zip`
-- Linux: `flaresolverr_linux_x64.tar.gz`
+### 常用命令
 
-下载后目录结构为：`./flaresolverr/...`
-
-## 先启动 FlareSolverr
-
-默认接口地址：`http://127.0.0.1:8191/v1`
-
-## CLI 运行
-
-```bash
-go run . -out alive.txt -csv-out all_proxies.csv -flaresolverr-url "http://127.0.0.1:8191/v1" -retries 3
-```
-
-## 源代码运行模式
-
-直接运行源码（跨平台）：
+直接运行（按配置执行）：
 
 ```bash
 go run .
 ```
 
-源码命令行模式（不进 GUI）：
+命令行模式（不进入 GUI）：
 
 ```bash
 go run . -gui=false
 ```
 
-源码指定配置文件：
+抓取最大页（500）并导出 txt+csv：
 
 ```bash
-go run . -config "/path/to/socks-grabber.json"
+go run . -gui=false -page-size 500 -out alive.txt -csv-out all_proxies.csv
 ```
 
-先编译再运行：
+关闭可用性检测（只抓取）：
+
+```bash
+go run . -gui=false -check=false
+```
+
+---
+
+## 编译运行
+
+### 常用命令
+
+编译：
 
 ```bash
 go build -o socks-grabber .
+```
+
+运行（按配置执行）：
+
+```bash
+./socks-grabber
+```
+
+命令行模式（不进入 GUI）：
+
+```bash
 ./socks-grabber -gui=false
 ```
 
-Windows 编译运行示例：
+Windows 示例：
 
 ```bash
 go build -o socks-grabber.exe .
 socks-grabber.exe -gui=false
 ```
 
-## 常用命令
+---
 
-直接运行（读取同目录 `socks-grabber.json`）：
+## 配置文件示例
 
-```bash
-./socks-grabber
-```
-
-命令行模式（不进 GUI）：
-
-```bash
-./socks-grabber -gui=false
-```
-
-指定配置文件：
-
-```bash
-./socks-grabber -config "/path/to/socks-grabber.json"
-```
-
-导出可用代理到 txt + 全量结果到 csv：
-
-```bash
-./socks-grabber -gui=false -out alive.txt -csv-out all_proxies.csv
-```
-
-抓取最大页（最多 500）：
-
-```bash
-./socks-grabber -gui=false -page-size 500
-```
-
-`-page-size` 可选值：`30/50/100/200/300/500`。如果输入其他值，会自动归一化到最接近的可选值。
-
-关闭检测（只抓取，不测可用性）：
-
-```bash
-./socks-grabber -gui=false -check=false
-```
-
-自定义测试网址（默认 AWS）：
-
-```bash
-./socks-grabber -gui=false -check-url "https://aws.amazon.com"
-```
-
-Windows 可直接用：`socks-grabber.exe ...`
-
-说明：
-- `txt`（`-out`）只导出可用代理，格式：`协议://ip:port`
-- `csv`（`-csv-out`）导出全部代理及检测结果（可用/不可用都会保留）
-
-CSV 列：`protocol,ip,port,proxy,alive,latency_ms,error,source`
-
-抓取条数默认会请求最大页：
-
-```bash
-go run . -gui=false -page-size 500
-```
-
-配置文件示例（`socks-grabber.json`）：
+文件名：`socks-grabber.json`
 
 ```json
 {
@@ -147,64 +118,52 @@ go run . -gui=false -page-size 500
   "check_timeout": "3s",
   "check_url": "https://aws.amazon.com",
   "socks5_handshake": true,
-  "gui": false,
+  "gui": true,
   "gui_addr": "127.0.0.1:8090"
 }
 ```
 
-只抓取不做可用性检测：
+说明：
+- `page_size` 仅支持：`30/50/100/200/300/500`（其他值会归一化到最近档位）
+- `out` 只写入可用代理
+- `csv_out` 写入全部代理和测试结果
 
-```bash
-go run . -out alive.txt -csv-out all_proxies.csv -check=false
-```
+---
 
-说明：关闭检测后，CSV 中 `error` 会标记为 `not_checked`。
-
-JSON 输出：
-
-```bash
-go run . -out proxies.json -json
-```
-
-## GUI 模式
-
-```bash
-go run . -gui=true
-```
-
-如果配置文件里 `"gui": true`，直接运行也会进入 GUI：
-
-```bash
-./socks-grabber
-```
-
-默认地址：`http://127.0.0.1:8090`
-
-自定义地址：
-
-```bash
-go run . -gui=true -gui-addr "127.0.0.1:9000"
-```
-
-## 参数
+## 参数说明
 
 - `-url` 目标地址（默认 `https://spys.one/en/socks-proxy-list/`）
 - `-config` 指定 JSON 配置文件路径
-- `-out` 输出文件
-- `-csv-out` CSV 输出文件（全部代理+检测结果）
-- `-json` JSON 输出
+- `-out` TXT 输出文件（仅可用代理）
+- `-csv-out` CSV 输出文件（全部代理 + 结果）
+- `-json` TXT 输出改为 JSON
 - `-timeout` 全局超时
-- `-flaresolverr-url` FlareSolverr v1 地址
+- `-flaresolverr-url` FlareSolverr 接口地址（默认 `http://127.0.0.1:8191/v1`）
 - `-flaresolverr-timeout` FlareSolverr `maxTimeout`
-- `-page-size` 单页目标条数（30/50/100/200/300/500）
-- `-retries` 重试次数
-- `-retry-backoff` 退避基础时间
-- `-retry-jitter` 退避抖动
-- `-check` 是否检测可用性
-- `-only-alive` 仅输出可用代理
+- `-page-size` 单页条数（`30/50/100/200/300/500`）
+- `-retries` FlareSolverr 抓取重试次数
+- `-retry-backoff` 重试退避基础时长
+- `-retry-jitter` 重试抖动时长
+- `-check` 是否进行可用性检测
+- `-only-alive` 是否只保留可用代理（影响最终 txt/json 输出）
 - `-check-workers` 检测并发
 - `-check-timeout` 单代理检测超时
-- `-check-url` 通过代理访问测试网址（默认 `https://aws.amazon.com`）
-- `-socks5-handshake` 是否做 SOCKS5 握手
+- `-check-url` 通过代理访问的测试网址（默认 `https://aws.amazon.com`）
+- `-socks5-handshake` 是否启用 SOCKS5 握手检测
 - `-gui` 启动 GUI
-- `-gui-addr` GUI 监听地址
+- `-gui-addr` GUI 监听地址（默认 `127.0.0.1:8090`）
+
+---
+
+## FlareSolverr 自动处理
+
+程序会自动处理 FlareSolverr，无需手工预启动：
+- 先检测 `-flaresolverr-url` 是否可达
+- 不可达则尝试启动同级目录 `./flaresolverr/` 下可执行文件
+- 若同级目录不存在，会自动下载对应系统版本并解压后再启动
+
+当前自动下载资产：
+- Windows: `flaresolverr_windows_x64.zip`
+- Linux: `flaresolverr_linux_x64.tar.gz`
+
+GitHub Actions 也只编译以上平台版本（Windows x64 / Linux x64）。
