@@ -1,0 +1,21 @@
+{
+  "url": "https://spys.one/en/socks-proxy-list/",
+  "out": "alive.txt",
+  "csv_out": "all_proxies.csv",
+  "json": false,
+  "timeout": "3m",
+  "flaresolverr_url": "http://127.0.0.1:8191/v1",
+  "flaresolverr_timeout": "90s",
+  "page_size": 500,
+  "retries": 3,
+  "retry_backoff": "3s",
+  "retry_jitter": "1200ms",
+  "check": true,
+  "only_alive": true,
+  "check_workers": 64,
+  "check_timeout": "3s",
+  "check_url": "https://aws.amazon.com",
+  "socks5_handshake": true,
+  "gui": true,
+  "gui_addr": "127.0.0.1:8090"
+}

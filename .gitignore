@@ -1,0 +1,11 @@
+flaresolverr/
+*.exe
+*.tmp
+*.log
+test.txt
+page.html
+flaresolverr_response.json
+alive.txt
+all_proxies.csv
+proxies.txt
+proxies.json
