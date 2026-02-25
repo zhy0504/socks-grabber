@@ -32,6 +32,30 @@ FlareSolverr 在本项目中的作用是：
 - 可执行文件同目录
 - 当前工作目录
 
+### 软件默认启动参数（无配置文件时）
+
+- `url`: `https://spys.one/en/socks-proxy-list/`
+- `out`: `proxies.txt`
+- `csv-out`: `proxies.csv`
+- `json`: `false`
+- `timeout`: `3m`
+- `flaresolverr-url`: `http://127.0.0.1:8191/v1`
+- `flaresolverr-timeout`: `90s`
+- `page-size`: `500`
+- `retries`: `3`
+- `retry-backoff`: `3s`
+- `retry-jitter`: `1200ms`
+- `check`: `true`
+- `only-alive`: `true`
+- `check-workers`: `64`
+- `check-timeout`: `3s`
+- `check-url`: `https://aws.amazon.com`
+- `socks5-handshake`: `true`
+- `gui`: `false`
+- `gui-addr`: `127.0.0.1:8090`
+
+说明：仓库里的 `socks-grabber.json` 是示例配置，当前设置为 `"gui": true`，因此直接运行会进入 GUI。
+
 ---
 
 ## 源代码启动
